@@ -76,9 +76,13 @@ class MyServer(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-        self.send_response(301)
+        if 'user-agent' in self.headers and 'Twitterbot' in self.headers['user-agent']:
+            self.send_response(200)
+        else:
+            self.send_response(301)
+            self.send_header("Location", blog_path)
+
         self.send_header("Content-type", "text/html")
-        self.send_header("Location", blog_path)
         self.end_headers()
         body_handle: TextIO = open(file=self.template, mode="r")
         body: str = "".join(body_handle.readlines()).format(post_title=match["title"], post_summary=match["summary"], post_url=match["link"])
